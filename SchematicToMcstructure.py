@@ -34,7 +34,13 @@ exportpath = importpath[0:index1] + "\\" + filename + ".mcstructure"
 #log.info(exportpath)
 #log.info(filename)
 wrapper = MCStructureFormatWrapper(exportpath)
-wrapper.create_and_open("bedrock", [1, 19, 0], selection, False)
+
+try:
+    wrapper.create_and_open("bedrock", [1, 19, 0], selection, False)
+except:
+    box=wx.MessageDialog(None,'同名の.mcstructureファイルが存在します','',wx.OK)
+    box.ShowModal()
+    sys.exit()
 wrapper_dimension = wrapper.dimensions[0]
 #log.info(chunk_count)
 #log.info(selection.chunk_locations())
@@ -43,3 +49,6 @@ for (cx, cz) in selection.chunk_locations():
     wrapper.commit_chunk(chunk, wrapper_dimension)
 wrapper.save()
 wrapper.close()
+box=wx.MessageDialog(None,'完了しました','',wx.OK)
+box.ShowModal()
+
