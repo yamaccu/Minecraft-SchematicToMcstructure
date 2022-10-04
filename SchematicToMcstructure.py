@@ -1,32 +1,30 @@
+from asyncio.windows_events import NULL
 import amulet
 from amulet.level.formats.mcstructure import MCStructureFormatWrapper
-import wx
+import tkinter
+from tkinter import messagebox
+from tkinter import filedialog
 import logging
 import sys
 
 log = logging.getLogger(__name__)
+tk = tkinter
+tk.Tk().withdraw()
 
-app = wx.App()
-with wx.FileDialog(
-    None,
-    'Select Schematic File',
-    wildcard="|".join(
-        [
-            "Legacy Schematic file (*.schematic)|*.schematic",
-            "All files (*.construction;*.mcstructure;*.schematic)|*.construction;*.mcstructure;*.schematic",
-        ]),
-    style=wx.FD_OPEN) as dialog:
-    if dialog.ShowModal() == wx.ID_OK:
-        importpath = dialog.GetPaths()[0]
-    else:
-        sys.exit()
+type = [('Legacy Schematic file','*.schematic')]
+importpath = tk.filedialog.askopenfilename(filetypes = type)
+log.info(importpath)
+
+if importpath == "":
+    tk.messagebox.showwarning('メッセージ', 'ファイルを読み込みできませんでした')
+    sys.exit()
 
 level = amulet.load_level(importpath)
 selection =  level.bounds(level.dimensions[0])
 #log.info(selection)
 
-index1 = importpath.rfind("\\")
-index2 = importpath.rfind(".")
+index1 = importpath.rfind(r'/')
+index2 = importpath.rfind('.')
 filename = importpath[index1+1:index2]
 exportpath = importpath[0:index1] + "\\" + filename + ".mcstructure"
 #log.info(index1)
@@ -38,8 +36,7 @@ wrapper = MCStructureFormatWrapper(exportpath)
 try:
     wrapper.create_and_open("bedrock", [1, 19, 0], selection, False)
 except:
-    box=wx.MessageDialog(None,'同名の.mcstructureファイルが存在します','',wx.OK)
-    box.ShowModal()
+    tk.messagebox.showwarning('メッセージ', '同名の.mcstructureファイルが存在します')
     sys.exit()
 wrapper_dimension = wrapper.dimensions[0]
 #log.info(chunk_count)
@@ -49,6 +46,4 @@ for (cx, cz) in selection.chunk_locations():
     wrapper.commit_chunk(chunk, wrapper_dimension)
 wrapper.save()
 wrapper.close()
-box=wx.MessageDialog(None,'完了しました','',wx.OK)
-box.ShowModal()
-
+tk.messagebox.showinfo('メッセージ', '完了しました。')
