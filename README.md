@@ -2,7 +2,6 @@
 
 ## 必要ライブラリ
 [Amulet-Core](https://pypi.org/project/amulet-core/)  
-[wxpython](https://pypi.org/project/wxPython/)
 
 ## 使い方
 1. SchematicToMcstructure.pyを実行  
